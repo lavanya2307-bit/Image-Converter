@@ -1,0 +1,17 @@
+{
+  "name": "Image Converter",
+  "short_name": "Image Converter",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#06101f",
+  "theme_color": "#071124",
+  "description": "Online image conversion and PDF utility workspace",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

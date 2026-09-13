@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owner Portal • Image Converter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="owner-page">
+<div id="ownerToast" class="toast"></div>
+
+<section id="login" class="onboarding">
+  <div class="onboard-glow"></div>
+  <div class="onboard-card">
+    <div class="brand-mark">🔐</div><div class="eyebrow">PRIVATE OWNER AREA</div>
+    <h1>Admin Portal</h1><p>Only the server-side owner credentials can unlock this dashboard.</p>
+    <form id="loginForm">
+      <label>Owner email</label><input id="adminEmail" type="email" placeholder="Owner email" required />
+      <label>Password</label><input id="adminPassword" type="password" placeholder="Owner password" required />
+      <button class="primary full" type="submit">Login <span>→</span></button>
+    </form>
+    <a class="back-link" href="/">← Back to Image Converter</a>
+  </div>
+</section>
+
+<section id="dashboard" class="admin-shell hidden">
+  <header class="admin-top">
+    <div><div class="eyebrow">OWNER CONTROL CENTER</div><h1>Image Converter Admin</h1><p class="admin-subtitle">Monitor users, conversions and platform activity from one place.</p></div>
+    <div class="admin-actions"><span id="lastUpdated" class="last-updated">Not loaded yet</span><button id="logout" class="ghost">Logout</button></div>
+  </header>
+
+  <div class="stats-grid">
+    <div class="stat-card"><small>Total users</small><strong id="usersCount">0</strong><span class="stat-note">Registered accounts</span></div>
+    <div class="stat-card"><small>Active now</small><strong id="activeCount">0</strong><span class="stat-note">Seen in last 15 min</span></div>
+    <div class="stat-card"><small>Total activity</small><strong id="activityCount">0</strong><span class="stat-note">All recorded actions</span></div>
+    <div class="stat-card"><small>Conversions</small><strong id="convertCount">0</strong><span class="stat-note">Image format changes</span></div>
+    <div class="stat-card"><small>Image → PDF</small><strong id="imagePdfCount">0</strong><span class="stat-note">PDF creations</span></div>
+    <div class="stat-card"><small>HD quality</small><strong id="utilityCount">0</strong><span class="stat-note"><span id="hdCount">0</span> HD operations</span></div>
+  </div>
+
+  <section class="admin-panel admin-panel-wide">
+    <div class="panel-head">
+      <div><div class="eyebrow">USER MANAGEMENT</div><h2>Registered users</h2></div>
+      <div class="panel-tools"><input id="userSearch" class="admin-search" placeholder="Search name or email…" /><button class="ghost" id="exportUsers">Export CSV</button><button class="ghost" id="refresh">Refresh</button></div>
+    </div>
+    <div class="table-wrap aligned-table-wrap">
+      <table class="admin-table users-table">
+        <colgroup><col class="col-user"><col class="col-email"><col class="col-date"><col class="col-date"><col class="col-status"><col class="col-actions"></colgroup>
+        <thead><tr><th>User</th><th>Email</th><th>Registered</th><th>Last seen</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="usersTable"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="admin-panel admin-panel-wide activity-panel">
+    <div class="panel-head">
+      <div><div class="eyebrow">AUDIT LOG</div><h2>Recent activity</h2></div>
+      <div class="panel-tools"><select id="actionFilter" class="admin-select"><option value="all">All actions</option><option>Image conversion</option><option>Image to PDF</option><option>HD quality</option><option>PDF merge</option><option>ZIP viewer</option></select><button class="ghost" id="exportActivity">Export CSV</button></div>
+    </div>
+    <div class="table-wrap aligned-table-wrap activity-table-wrap">
+      <table class="admin-table activity-table">
+        <colgroup><col class="act-user"><col class="act-action"><col class="act-input"><col class="act-output"><col class="act-files"><col class="act-time"></colgroup>
+        <thead><tr><th>User</th><th>Action</th><th>Input</th><th>Output</th><th>Files</th><th>Time</th></tr></thead>
+        <tbody id="activityTable"></tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<script>
+const $=s=>document.querySelector(s); const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+let allUsers=[], allActivity=[];
+function toast(m){const e=$("#ownerToast");e.textContent=m;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2500)}
+function formatDate(v){return v?new Date(v).toLocaleString([], {dateStyle:"medium",timeStyle:"short"}):"—"}
+function isActive(v){return v && (Date.now()-new Date(v).getTime())<=15*60*1000}
+function statusHTML(v){return isActive(v)?'<span class="status active"><i></i>Active</span>':'<span class="status offline"><i></i>Offline</span>'}
+function iconFor(a){return a==="Image conversion"?"⇄":a==="Image to PDF"?"▤":a==="HD quality"?"✦":a==="PDF merge"?"⊕":a==="ZIP viewer"?"▣":"•"}
+function renderUsers(){const q=$("#userSearch").value.trim().toLowerCase();const rows=allUsers.filter(u=>!q||u.name.toLowerCase().includes(q)||u.email.toLowerCase().includes(q));$("#usersTable").innerHTML=rows.length?rows.map(u=>`<tr><td><div class="user-cell"><span class="avatar small">${esc((u.name||"U")[0].toUpperCase())}</span><strong title="${esc(u.name)}">${esc(u.name)}</strong></div></td><td class="truncate" title="${esc(u.email)}">${esc(u.email)}</td><td>${formatDate(u.created_at)}</td><td>${formatDate(u.last_seen)}</td><td>${statusHTML(u.last_seen)}</td><td><span class="table-badge">${u.activity_count} action${u.activity_count===1?"":"s"}</span></td></tr>`).join(""):`<tr><td colspan="6" class="empty-cell">No matching users.</td></tr>`}
+function renderActivity(){const f=$("#actionFilter").value;const rows=allActivity.filter(a=>f==="all"||a.action===f);$("#activityTable").innerHTML=rows.length?rows.map(a=>`<tr><td><div class="activity-user"><strong>${esc(a.name||"Unknown")}</strong><small>${esc(a.email||"")}</small></div></td><td><span class="action-pill"><b>${iconFor(a.action)}</b>${esc(a.action)}</span></td><td class="truncate" title="${esc(a.input_name||"—")}">${esc(a.input_name||"—")}</td><td class="truncate" title="${esc(a.output_name||"—")}">${esc(a.output_name||"—")}</td><td><span class="file-count">${a.file_count}</span></td><td>${formatDate(a.created_at)}</td></tr>`).join(""):`<tr><td colspan="6" class="empty-cell">No activity found.</td></tr>`}
+async function checkLogin(){try{const r=await fetch("/api/admin/me");if(r.ok){$("#login").classList.add("hidden");$("#dashboard").classList.remove("hidden");loadDashboard()}}catch(e){}}
+$("#loginForm").addEventListener("submit",async e=>{e.preventDefault();const b=e.target.querySelector("button");b.disabled=true;b.textContent="Checking…";try{const r=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:$("#adminEmail").value.trim(),password:$("#adminPassword").value})});const d=await r.json();if(!r.ok)return toast(d.error||"Login failed.");$("#login").classList.add("hidden");$("#dashboard").classList.remove("hidden");loadDashboard()}catch(e){toast("Server connection failed.")}finally{b.disabled=false;b.innerHTML='Login <span>→</span>'}});
+$("#logout").addEventListener("click",async()=>{await fetch("/api/admin/logout",{method:"POST"});location.reload()});$("#refresh").addEventListener("click",loadDashboard);$("#userSearch").addEventListener("input",renderUsers);$("#actionFilter").addEventListener("change",renderActivity);
+async function loadDashboard(){const b=$("#refresh");b.disabled=true;b.textContent="Refreshing…";try{const [sR,uR,aR]=await Promise.all([fetch("/api/admin/summary"),fetch("/api/admin/users"),fetch("/api/admin/activity")]);if([sR,uR,aR].some(r=>r.status===401))return location.reload();const s=await sR.json(),u=await uR.json(),a=await aR.json();allUsers=u.users||[];allActivity=a.activity||[];$("#usersCount").textContent=s.users;$("#activeCount").textContent=s.activeUsers;$("#activityCount").textContent=s.activities;$("#convertCount").textContent=s.converted;$("#imagePdfCount").textContent=s.imagePdfs;$("#hdCount").textContent=s.hd;$("#utilityCount").textContent=(s.hd||0);$("#lastUpdated").textContent="Updated "+new Date().toLocaleTimeString();renderUsers();renderActivity()}catch(e){toast("Could not load dashboard data.")}finally{b.disabled=false;b.textContent="Refresh"}}
+function csvCell(v){return '"'+String(v??"").replace(/"/g,'""')+'"'}
+function downloadCSV(filename,headers,rows){const csv=[headers,...rows].map(r=>r.map(csvCell).join(",")).join("\n");const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=filename;a.click();URL.revokeObjectURL(a.href)}
+$("#exportUsers").addEventListener("click",()=>{downloadCSV("image-converter-users.csv",["Name","Email","Registered","Last seen","Status","Actions"],allUsers.map(u=>[u.name,u.email,formatDate(u.created_at),formatDate(u.last_seen),isActive(u.last_seen)?"Active":"Offline",u.activity_count]))});
+$("#exportActivity").addEventListener("click",()=>{const f=$("#actionFilter").value;const rows=allActivity.filter(a=>f==="all"||a.action===f);downloadCSV("image-converter-activity.csv",["User","Email","Action","Input","Output","Files","Time"],rows.map(a=>[a.name,a.email,a.action,a.input_name,a.output_name,a.file_count,formatDate(a.created_at)]))});
+checkLogin();setInterval(()=>{if(!$("#dashboard").classList.contains("hidden"))loadDashboard()},30000);
+</script>
+</body></html>

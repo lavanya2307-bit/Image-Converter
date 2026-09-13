@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Convert images, create PDFs and improve image quality in one clean workspace." />
+  <link rel="manifest" href="manifest.json" />
+  <title>Image Converter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="toast" class="toast"></div>
+
+  <section id="onboarding" class="onboarding hidden">
+    <div class="onboard-glow"></div>
+    <div class="onboard-card">
+      <div class="brand-mark">✦</div>
+      <div class="eyebrow">WELCOME</div>
+      <h1>Image Converter</h1>
+      <p>Convert images, create PDFs and improve resolution in one clean workspace.</p>
+
+      <form id="profileForm">
+        <label>Your name</label>
+        <input id="name" maxlength="80" placeholder="Enter your name" required />
+
+        <label>Your email</label>
+        <input id="email" type="email" maxlength="160" placeholder="Enter your email" required />
+
+        <button class="primary full" type="submit">Continue <span>→</span></button>
+      </form>
+
+      <small>Your details are used to personalize your workspace.</small>
+    </div>
+  </section>
+
+  <section id="app" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">✦</div>
+        <div>
+          <strong>Image</strong> Converter
+          <small>Simple • Fast • Clean</small>
+        </div>
+      </div>
+
+      <nav class="nav-list">
+        <button class="nav active" data-view="guide"><span>⌂</span> Guide</button>
+        <button class="nav" data-view="convert"><span>⇄</span> Convert</button>
+        <button class="nav" data-view="image-pdf"><span>▤</span> Image to PDF</button>
+        <button class="nav" data-view="merge"><span>⊕</span> PDF Merge</button>
+        <button class="nav" data-view="hd"><span>✦</span> HD Quality</button>
+        <button class="nav" data-view="zip"><span>▣</span> ZIP Viewer</button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="profile-mini">
+          <div id="avatar" class="avatar">L</div>
+          <div>
+            <strong id="sideName">User</strong>
+            <small id="sideEmail">user@email.com</small>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">IMAGE WORKSPACE</div>
+          <h2 id="pageTitle">Guide</h2>
+        </div>
+        <div class="top-actions">
+          <button id="themeBtn" class="icon-btn" title="Toggle dark/light mode">☼</button>
+          <button id="profileBtn" class="user-pill">
+            <span id="topAvatar" class="avatar small">L</span>
+            <span id="topName">User</span>
+          </button>
+        </div>
+      </header>
+
+      <div id="content"></div>
+    </main>
+  </section>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>

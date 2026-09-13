@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log*
+.env
+.env.*
+!.env.example
+image-converter.db
+image-converter.db-shm
+image-converter.db-wal
+.git
+.gitignore
+.vscode
